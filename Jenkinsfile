@@ -18,9 +18,9 @@ pipeline {
             cobertura(coberturaReportFile: ' target/site/cobertura/coverage.xml')
           }
         }
-        stage('') {
+        stage('error') {
           steps {
-            cobertura()
+            junit 'target/surefire-reports/*.xml'
           }
         }
       }
