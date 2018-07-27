@@ -6,6 +6,11 @@ pipeline {
         checkout scm
       }
     }
+    stage('') {
+      steps {
+        sh 'mvn test'
+      }
+    }
   }
   post {
     always {
