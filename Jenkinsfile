@@ -6,9 +6,38 @@ pipeline {
         checkout scm
       }
     }
-    stage('') {
+    stage('test') {
       steps {
-        sh 'mvn test'
+        sh 'mvn clean cobertura:cobertura test'
+      }
+    }
+    stage('report') {
+      parallel {
+        stage('report') {
+          steps {
+            cobertura(coberturaReportFile: ' target/site/cobertura/coverage.xml')
+          }
+        }
+        stage('') {
+          steps {
+            cobertura()
+          }
+        }
+      }
+    }
+    stage('package') {
+      steps {
+        sh 'mvn package'
+      }
+    }
+    stage('archive') {
+      steps {
+        archiveArtifacts 'target/spring-boot-sample-data-rest-0.1.0.jar'
+      }
+    }
+    stage('depoly') {
+      steps {
+        sh 'make deploy-default'
       }
     }
   }
