@@ -8,26 +8,17 @@ pipeline {
     }
     stage('test') {
       steps {
-        sh 'mvn clean cobertura:cobertura test'
+        sh 'docker-compose run test'
       }
     }
-    stage('report') {
-      parallel {
-        stage('report') {
-          steps {
-            cobertura(coberturaReportFile: ' target/site/cobertura/coverage.xml')
-          }
-        }
-        stage('error') {
-          steps {
-            junit 'target/surefire-reports/*.xml'
-          }
-        }
+    stage('error') {
+      steps {
+        junit 'target/surefire-reports/*.xml'
       }
     }
     stage('package') {
       steps {
-        sh 'mvn package'
+        sh 'docker-compose run package'
       }
     }
     stage('archive') {
@@ -37,7 +28,9 @@ pipeline {
     }
     stage('depoly') {
       steps {
-        sh 'make deploy-default'
+        sh '''make build-docker-prod-image
+docker push localhost:5000/java_sample_prod
+make deploy-production-ssh'''
       }
     }
   }
